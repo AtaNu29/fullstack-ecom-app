@@ -22,7 +22,7 @@ import { useAuthStore } from "@/lib/auth-store";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
+  const { login, register } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,21 +56,15 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
     // Demo registration - in production, this would call Supabase auth
-    login({
-      id: "user-new",
-      email: formData.email,
-      name: formData.name,
-      role: "user",
-      createdAt: new Date().toISOString(),
-    });
+    const result = register(formData.email, formData.password, formData.name);
 
-    router.push("/");
+    if (result.success) {
+      router.push("/");
+    } else {
+      setError(result.error || "Registration failed");
+    }
+
     setIsLoading(false);
   };
 
@@ -146,9 +140,8 @@ export default function RegisterPage() {
               {passwordRequirements.map((req) => (
                 <div
                   key={req.label}
-                  className={`flex items-center gap-2 text-xs ${
-                    req.met ? "text-accent" : "text-muted-foreground"
-                  }`}
+                  className={`flex items-center gap-2 text-xs ${req.met ? "text-accent" : "text-muted-foreground"
+                    }`}
                 >
                   <Check
                     className={`w-3 h-3 ${req.met ? "opacity-100" : "opacity-30"}`}

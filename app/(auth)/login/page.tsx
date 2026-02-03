@@ -40,15 +40,13 @@ export default function LoginPage() {
 
     // Demo login - in production, this would call Supabase auth
     if (formData.email && formData.password) {
-      const isAdmin = formData.email.includes("admin");
-      login({
-        id: "user-1",
-        email: formData.email,
-        name: formData.email.split("@")[0],
-        role: isAdmin ? "admin" : "user",
-        createdAt: new Date().toISOString(),
-      });
-      router.push(isAdmin ? "/admin" : "/");
+      const result = login(formData.email, formData.password);
+      if (result.success) {
+        const isAdmin = formData.email.toLowerCase().includes("admin");
+        router.push(isAdmin ? "/admin" : "/");
+      } else {
+        setError(result.error || "Login failed");
+      }
     } else {
       setError("Please fill in all fields");
     }
